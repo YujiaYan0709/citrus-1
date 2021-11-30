@@ -224,35 +224,33 @@ public class ClassUtilTests {
     public void getSimpleMethodSignature() throws Exception {
         Method m1 = MyClass.class.getDeclaredMethod("func");
         Method m2 = MyClass.class.getDeclaredMethod("func", String.class, long[].class);
-
+        String testStr;
         // null
         assertMethod(null, null, false, false, false, false);
-
+    
         // modifiers, returnType, className, exceptionTypes
         assertMethod("public final void ClassUtilTests.MyClass.func()", m1, true, true, true, true);
-        assertMethod(
-                "private static int ClassUtilTests.MyClass.func(String, long[]) throws IOException, RuntimeException",
-                m2, true, true, true, true);
-
-        // modifiers, returnType, className, exceptionTypes
-        assertMethod("public final void ClassUtilTests.MyClass.func()", m1, true, true, true, true);
-        assertMethod(
-                "private static int ClassUtilTests.MyClass.func(String, long[]) throws IOException, RuntimeException",
-                m2, true, true, true, true);
-
+        testStr = ClassUtil.getSimpleMethodSignature(m2, true, true, true, true);
+        assertTrue(testStr.equals("private static int ClassUtilTests.MyClass.func(String, long[]) throws IOException, RuntimeException") ||  
+                        testStr.equals("private static int ClassUtilTests.MyClass.func(String, long[]) throws RuntimeException, IOException"));
+            
         // no modifiers, returnType, className, exceptionTypes
         assertMethod("void ClassUtilTests.MyClass.func()", m1, false, true, true, true);
-        assertMethod("int ClassUtilTests.MyClass.func(String, long[]) throws IOException, RuntimeException", m2, false,
-                     true, true, true);
+        testStr = ClassUtil.getSimpleMethodSignature(m2, false, true, true, true);
+        assertTrue(testStr.equals("int ClassUtilTests.MyClass.func(String, long[]) throws IOException, RuntimeException") ||
+                        testStr.equals("int ClassUtilTests.MyClass.func(String, long[]) throws RuntimeException, IOException"));
 
         // no modifiers, no returnType, className, exceptionTypes
         assertMethod("ClassUtilTests.MyClass.func()", m1, false, false, true, true);
-        assertMethod("ClassUtilTests.MyClass.func(String, long[]) throws IOException, RuntimeException", m2, false,
-                     false, true, true);
+        testStr = ClassUtil.getSimpleMethodSignature(m2, false, false, true, true);
+        assertTrue(testStr.equals("ClassUtilTests.MyClass.func(String, long[]) throws IOException, RuntimeException") ||
+                        testStr.equals("ClassUtilTests.MyClass.func(String, long[]) throws RuntimeException, IOException"));
 
         // no modifiers, no returnType, no className, exceptionTypes
         assertMethod("func()", m1, false, false, false, true);
-        assertMethod("func(String, long[]) throws IOException, RuntimeException", m2, false, false, false, true);
+        testStr = ClassUtil.getSimpleMethodSignature(m2, false, false, false, true);
+        assertTrue(testStr.equals("func(String, long[]) throws IOException, RuntimeException") ||
+                        testStr.equals("func(String, long[]) throws RuntimeException, IOException"));
 
         // no modifiers, no returnType, no className, no exceptionTypes
         assertMethod("func()", m1, false, false, false, false);
